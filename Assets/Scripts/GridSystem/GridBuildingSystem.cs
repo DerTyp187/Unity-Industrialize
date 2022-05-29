@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Written with https://www.youtube.com/watch?v=dulosHPl82A
 public class GridBuildingSystem : MonoBehaviour
 {
     public static GridBuildingSystem instance;
@@ -11,17 +10,15 @@ public class GridBuildingSystem : MonoBehaviour
     public int gridHeight;
     public float cellSize;
 
+    [SerializeField] Color cannotBuildColor; // Maybe put this into every single PlacedObjectTypeSO for better customized use
+
     PlacedObjectTypeSO selectedPlacedObjectTypeSO;
     Transform selectedGameObjectTransform;
 
+    // Conveyor Placing Variables
     Vector3 conveyorStartPosition;
     List<GameObject> placingConveyorBlueprints = new List<GameObject>();
     bool isPlacingConveyor = false;
-
-    public Color cannotBuildColor; // Maybe put this into every single PlacedObjectTypeSO for better customized use
-
-    // Debug
-    public List<PlacedObjectTypeSO> DEBUG_OBJS = new List<PlacedObjectTypeSO>();
 
     public class GridObject
     {
@@ -51,14 +48,16 @@ public class GridBuildingSystem : MonoBehaviour
     void Awake()
     {
         if (instance == null)
+        {
             instance = this;
+        }
         else
+        {
             Destroy(gameObject);
+        }
 
         buildingGrid = new Grid<GridObject>(gridWidth, gridHeight, cellSize, Vector3.zero, (Grid<GridObject> g, int x, int y) => new GridObject(g, x, y));
     }
-
-
 
     void Update()
     {
@@ -74,32 +73,24 @@ public class GridBuildingSystem : MonoBehaviour
                 UpdateSelectedConveyor();
             }
         }
-
-        #region debug
-        // DEBUG
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SelectPlacedObjectTypeSO(DEBUG_OBJS[0]);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SelectPlacedObjectTypeSO(DEBUG_OBJS[1]);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SelectPlacedObjectTypeSO(DEBUG_OBJS[2]);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            SelectPlacedObjectTypeSO(DEBUG_OBJS[3]);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            SelectPlacedObjectTypeSO(DEBUG_OBJS[4]);
-        }
-        #endregion
     }
 
+    bool CanBuild(List<Vector2Int> gridPositionList)
+    {
+        bool canBuild = true;
+        foreach (Vector2Int gridPosition in gridPositionList)
+        {
+            if (!buildingGrid.GetGridObject(gridPosition.x, gridPosition.y).CanBuild())
+            {
+                // Cannot build here
+                canBuild = false;
+                break;
+            }
+        }
+        return canBuild;
+    }
+
+    #region BuildingPlacing
     void UpdateSelectedBuilding()
     {
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -130,6 +121,7 @@ public class GridBuildingSystem : MonoBehaviour
             DeselectPlacedObjectTypeSO();
         }
     }
+    #endregion
 
     #region ConveyorPlacing
     void UpdateSelectedConveyor()
@@ -243,7 +235,9 @@ public class GridBuildingSystem : MonoBehaviour
         return canBuild;
     }
     #endregion
-    public void DemolishBuilding(Vector3 position)
+
+    #region PlacedObjectsTypeSO Methods
+    public void DemolishPlacedObjectTypeSO(Vector3 position)
     {
         GridObject gridObject = buildingGrid.GetGridObject(position); // Camera.main.ScreenToWorldPoint(Input.mousePosition)
         PlacedObject placedObject = gridObject.GetPlacedObject();
@@ -261,20 +255,7 @@ public class GridBuildingSystem : MonoBehaviour
         }
     }
 
-    bool CanBuild(List<Vector2Int> gridPositionList)
-    {
-        bool canBuild = true;
-        foreach (Vector2Int gridPosition in gridPositionList)
-        {
-            if (!buildingGrid.GetGridObject(gridPosition.x, gridPosition.y).CanBuild())
-            {
-                // Cannot build here
-                canBuild = false;
-                break;
-            }
-        }
-        return canBuild;
-    }
+
 
     public GameObject PlacePlacedObjectTypeSO(Vector3 position, PlacedObjectTypeSO placedObjectTypeSO)
     {
@@ -331,4 +312,5 @@ public class GridBuildingSystem : MonoBehaviour
         isPlacingConveyor = false;
         placingConveyorBlueprints.Clear();
     }
+    #endregion
 }
