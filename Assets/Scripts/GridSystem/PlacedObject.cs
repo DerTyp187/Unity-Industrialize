@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public abstract class PlacedObject : MonoBehaviour
 {
@@ -16,15 +14,14 @@ public abstract class PlacedObject : MonoBehaviour
         placedObject.OnPlace();
         placedObject.SetIsBlueprint(false);
 
-        if (placedObjectTypeSO.isWalkable) 
+        if (placedObjectTypeSO.isWalkable)
         {
-            foreach(Vector2Int position in placedObject.GetGridPositionList())
+            foreach (Vector2Int position in placedObject.GetGridPositionList())
             {
-                Pathfinding.Instance.GetNode(position.x, position.y).SetIsWalkable(true);
+                Pathfinding.instance.GetNode(position.x, position.y).SetIsWalkable(true);
             }
 
         }
-
 
         return placedObject;
     }
@@ -49,7 +46,7 @@ public abstract class PlacedObject : MonoBehaviour
                 GetComponent<Collider2D>().enabled = true;
             }
         }
-        
+
         isBlueprint = newIsBlueprint;
     }
 
@@ -71,7 +68,7 @@ public abstract class PlacedObject : MonoBehaviour
         {
             foreach (Vector2Int position in GetGridPositionList())
             {
-                Pathfinding.Instance.GetNode(position.x, position.y).SetIsWalkable(false);
+                Pathfinding.instance.GetNode(position.x, position.y).SetIsWalkable(false);
             }
         }
         Destroy(gameObject);

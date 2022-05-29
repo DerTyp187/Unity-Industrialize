@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 632704925c0ac0848a70bc1c20e19aba, type: 3}
+  m_Name: TestObjectType
+  m_EditorClassIdentifier: 
+  placedObjectID: po_testobject
+  nameString: TestObject
+  prefab: {fileID: 7260014803614823994, guid: 21a436d4b070c424096d82635ad7956b, type: 3}
+  width: 1
+  height: 1
+  isWalkable: 0
+  iconSprite: {fileID: 21300000, guid: bb4db44c71a60dd4cb98205a9dfa6014, type: 3}
+  placedObjectCategory: 1

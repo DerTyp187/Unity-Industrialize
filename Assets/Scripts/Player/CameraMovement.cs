@@ -4,13 +4,13 @@ public class CameraMovement : MonoBehaviour
 {
     [Header("Speed")]
     [SerializeField]
-    float speed = 150f;
+    float speed = 100f;
 
     [SerializeField]
-    float fastSpeed = 300f;
+    float fastSpeed = 200f;
 
     [SerializeField]
-    float slowSpeed = 50f;
+    float slowSpeed = 30f;
 
     [Header("Zoom")]
     [SerializeField]
@@ -29,8 +29,6 @@ public class CameraMovement : MonoBehaviour
 
     Vector3 origin;
     Vector3 difference;
-
-
 
     Camera cam;
     Rigidbody2D rb;

@@ -1,10 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/PlacedObjectTypeSO")]
 public class PlacedObjectTypeSO : ScriptableObject
 {
+    public enum PlacedObjectCategory
+    {
+        CONVEYOR,
+        BUILDING
+    }
+
     public string placedObjectID;
     public string nameString;
     public Transform prefab;
@@ -12,6 +17,7 @@ public class PlacedObjectTypeSO : ScriptableObject
     public int height;
     public bool isWalkable = false;
     public Sprite iconSprite;
+    public PlacedObjectCategory placedObjectCategory;
 
     public List<Vector2Int> GetGridPositionList(Vector2Int offset)
     {
@@ -25,7 +31,4 @@ public class PlacedObjectTypeSO : ScriptableObject
         }
         return gridPositionList;
     }
-
-
-
 }
