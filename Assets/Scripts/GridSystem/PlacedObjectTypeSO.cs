@@ -10,7 +10,7 @@ public class PlacedObjectTypeSO : ScriptableObject
         BUILDING
     }
 
-    public string placedObjectID;
+    public string id;
     public string nameString;
     public Transform prefab;
     public int width;

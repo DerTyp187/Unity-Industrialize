@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 632704925c0ac0848a70bc1c20e19aba, type: 3}
   m_Name: ConveyorType
   m_EditorClassIdentifier: 
-  placedObjectID: po_conveyor
+  id: po_conveyor
   nameString: Conveyor
   prefab: {fileID: 482431360831806948, guid: b7db5dad065240e47a4dbd74957b5ef0, type: 3}
   width: 1
