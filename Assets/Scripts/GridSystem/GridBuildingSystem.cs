@@ -15,6 +15,8 @@ public class GridBuildingSystem : MonoBehaviour
     PlacedObjectTypeSO selectedPlacedObjectTypeSO;
     Transform selectedGameObjectTransform;
 
+    PlacedObject selectedMovingPlacedObject;
+
     // Conveyor Placing Variables
     Vector3 conveyorStartPosition;
     List<GameObject> placingConveyorBlueprints = new List<GameObject>();
@@ -72,6 +74,11 @@ public class GridBuildingSystem : MonoBehaviour
             {
                 UpdateSelectedConveyor();
             }
+        }
+
+        if (selectedMovingPlacedObject != null)
+        {
+            UpdateSelectedMovingPlacedObject();
         }
     }
 
@@ -203,8 +210,6 @@ public class GridBuildingSystem : MonoBehaviour
             Debug.Log(pathPoints.Count);
             foreach (Vector2Int position in pathPoints)
             {
-                Debug.Log("TEST");
-                Debug.Log(position);
                 GameObject conveyorBlueprint = Instantiate(selectedPlacedObjectTypeSO.prefab.gameObject, new Vector3(position.x, position.y), Quaternion.identity);
                 placingConveyorBlueprints.Add(conveyorBlueprint);
             }
@@ -247,7 +252,105 @@ public class GridBuildingSystem : MonoBehaviour
     }
     #endregion
 
+    #region MovingPlacedObject
+
+    public bool MovingObjectIsOnNewPosition(Vector3 mousePosition)
+    {
+        buildingGrid.GetXY(mousePosition, out int x, out int y);
+
+        if (selectedMovingPlacedObject.origin.x != x || selectedMovingPlacedObject.origin.y != y)
+        {
+            Debug.Log("Moving object is on new position");
+            return true;
+        }
+        else
+        {
+            Debug.Log("Moving object is on same position");
+            return false;
+        }
+    }
+
+    public void SelectMovingPlacedObject(Vector3 fromPosition)
+    {
+        Debug.Log("Selecting moving placed object");
+        buildingGrid.GetXY(fromPosition, out int fromX, out int fromY);
+
+        if (buildingGrid.GetGridObject(fromX, fromY).GetPlacedObject() != null)
+        {
+            selectedMovingPlacedObject = buildingGrid.GetGridObject(fromX, fromY).GetPlacedObject();
+        }
+        else
+        {
+            Debug.Log("No placed object found");
+        }
+
+    }
+
+    public void DeselectMovingPlacedObject()
+    {
+        Debug.Log("Deselecting moving placed object");
+        selectedMovingPlacedObject.gameObject.transform.position = buildingGrid.GetWorldPosition(selectedMovingPlacedObject.origin.x, selectedMovingPlacedObject.origin.y);
+        selectedMovingPlacedObject = null;
+    }
+
+    public void UpdateSelectedMovingPlacedObject()
+    {
+
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        buildingGrid.GetXY(mousePosition, out int x, out int y);
+
+        selectedMovingPlacedObject.gameObject.transform.position = buildingGrid.GetWorldPosition(x, y);
+
+        if (Input.GetMouseButtonDown(0) && MenuManager.AllMenusClosed() && MovingObjectIsOnNewPosition(mousePosition))
+        {
+            Debug.Log("Move selected moving placed object");
+            MoveSelectedMovingPlacedObject(mousePosition);
+            DeselectMovingPlacedObject();
+        }
+        else if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            DeselectMovingPlacedObject();
+        }
+    }
+
+    public void MoveSelectedMovingPlacedObject(Vector3 position)
+    {
+        // Remove old placed object from grid
+        Debug.Log("Removing old placed object from grid");
+        List<Vector2Int> gridPositionList = selectedMovingPlacedObject.GetGridPositionList();
+
+        foreach (Vector2Int gridPosition in gridPositionList)
+        {
+            buildingGrid.GetGridObject(gridPosition.x, gridPosition.y).ClearPlacedObject();
+            Debug.Log("Cleared placed object at " + gridPosition);
+        }
+
+        // Place new placed object at new position
+        Debug.Log("Placing new placed object at new position");
+        buildingGrid.GetXY(position, out int newX, out int newY);
+        List<Vector2Int> newGridPositionList = selectedMovingPlacedObject.placedObjectTypeSO.GetGridPositionList(new Vector2Int(newX, newY));
+
+        if (CanBuild(newGridPositionList))
+        {
+            selectedMovingPlacedObject.Move(new Vector2Int(newX, newY));
+
+            foreach (Vector2Int gridPosition in newGridPositionList)
+            {
+                buildingGrid.GetGridObject(gridPosition.x, gridPosition.y).SetPlacedObject(selectedMovingPlacedObject);
+                Debug.Log("Placed placed object at " + gridPosition);
+            }
+        }
+        else
+        {
+            Debug.Log("Cannot build here!" + " " + position);
+        }
+    }
+
+    #endregion
+
     #region PlacedObjectsTypeSO Methods
+
     public void DemolishPlacedObjectTypeSO(Vector3 position)
     {
         if (selectedPlacedObjectTypeSO != null)
@@ -269,20 +372,12 @@ public class GridBuildingSystem : MonoBehaviour
         }
     }
 
-
-
     public GameObject PlacePlacedObjectTypeSO(Vector3 position, PlacedObjectTypeSO placedObjectTypeSO)
     {
         position = new Vector3(position.x, position.y);
         buildingGrid.GetXY(position, out int x, out int y);
 
         List<Vector2Int> gridPositionList = placedObjectTypeSO.GetGridPositionList(new Vector2Int(x, y));
-
-        // DEBUG
-        foreach (Vector2Int gridPosition in gridPositionList)
-        {
-            Debug.Log(gridPosition);
-        }
 
         if (CanBuild(gridPositionList))
         {

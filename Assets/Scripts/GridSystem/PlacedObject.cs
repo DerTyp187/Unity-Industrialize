@@ -20,14 +20,13 @@ public abstract class PlacedObject : MonoBehaviour
             {
                 Pathfinding.instance.GetNode(position.x, position.y).SetIsWalkable(true);
             }
-
         }
 
         return placedObject;
     }
 
     public PlacedObjectTypeSO placedObjectTypeSO;
-    Vector2Int origin;
+    public Vector2Int origin;
 
     [SerializeField] private bool isBlueprint = true;
 
@@ -56,6 +55,30 @@ public abstract class PlacedObject : MonoBehaviour
     }
 
     public abstract void OnPlace();
+
+    public void Move(Vector2Int moveToPosition)
+    {
+        // Remove old isWalkabe
+        if (placedObjectTypeSO.isWalkable)
+        {
+            foreach (Vector2Int position in GetGridPositionList())
+            {
+                Pathfinding.instance.GetNode(position.x, position.y).SetIsWalkable(false);
+            }
+        }
+        origin = moveToPosition;
+        gameObject.transform.position = GridBuildingSystem.instance.buildingGrid.GetWorldPosition(moveToPosition.x, moveToPosition.y);
+
+        // add new isWalkable
+        if (placedObjectTypeSO.isWalkable)
+        {
+            foreach (Vector2Int position in GetGridPositionList())
+            {
+                Pathfinding.instance.GetNode(position.x, position.y).SetIsWalkable(true);
+            }
+        }
+    }
+
 
     public List<Vector2Int> GetGridPositionList()
     {
