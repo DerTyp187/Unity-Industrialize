@@ -199,13 +199,24 @@ public class GridBuildingSystem : MonoBehaviour
 
             ClearConveyorPath();
 
+            List<Vector2Int> pathPoints = VectorDrawing.FindVectorPath(conveyorStartPosition, endPosition);
+            Debug.Log(pathPoints.Count);
+            foreach (Vector2Int position in pathPoints)
+            {
+                Debug.Log("TEST");
+                Debug.Log(position);
+                GameObject conveyorBlueprint = Instantiate(selectedPlacedObjectTypeSO.prefab.gameObject, new Vector3(position.x, position.y), Quaternion.identity);
+                placingConveyorBlueprints.Add(conveyorBlueprint);
+            }
+
+            /*
             foreach (Vector3 position in Pathfinding.instance.FindPath(conveyorStartPosition, endPosition, true))
             {
                 buildingGrid.GetXY(position, out x, out y);
 
                 GameObject conveyorBlueprint = Instantiate(selectedPlacedObjectTypeSO.prefab.gameObject, new Vector3(x, y), Quaternion.identity);
                 placingConveyorBlueprints.Add(conveyorBlueprint);
-            }
+            }*/
 
         }
     }

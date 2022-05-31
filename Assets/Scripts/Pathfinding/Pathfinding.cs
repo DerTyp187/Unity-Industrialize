@@ -126,7 +126,7 @@ public class Pathfinding
         return null;
     }
 
-    private List<PathNode> GetNeighbourList(PathNode currentNode)
+    public List<PathNode> GetNeighbourList(PathNode currentNode)
     {
         List<PathNode> neighbourList = new List<PathNode>();
 
@@ -173,6 +173,14 @@ public class Pathfinding
         }
         path.Reverse();
         return path;
+    }
+
+    public int CalculateDistance(PathNode a, PathNode b)
+    {
+        int xDistance = Mathf.Abs(a.x - b.x);
+        int yDistance = Mathf.Abs(a.y - b.y);
+        int remaining = Mathf.Abs(xDistance - yDistance);
+        return Mathf.Min(xDistance, yDistance) + remaining;
     }
 
     private int CalculateDistanceCost(PathNode a, PathNode b)
