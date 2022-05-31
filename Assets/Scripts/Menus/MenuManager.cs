@@ -24,6 +24,18 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public static bool AllMenusClosed()
+    {
+        foreach (Menu menu in MenuDictionary.instance.entries)
+        {
+            if (menu.isOpen)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void Start()
     {
         CloseAllMenus();

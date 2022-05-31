@@ -239,6 +239,9 @@ public class GridBuildingSystem : MonoBehaviour
     #region PlacedObjectsTypeSO Methods
     public void DemolishPlacedObjectTypeSO(Vector3 position)
     {
+        if (selectedPlacedObjectTypeSO != null)
+            return;
+
         GridObject gridObject = buildingGrid.GetGridObject(position); // Camera.main.ScreenToWorldPoint(Input.mousePosition)
         PlacedObject placedObject = gridObject.GetPlacedObject();
 

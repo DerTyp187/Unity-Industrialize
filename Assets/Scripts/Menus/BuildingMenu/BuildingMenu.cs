@@ -18,7 +18,8 @@ public class BuildingMenu : Menu
 
         foreach (PlacedObjectTypeSO p in placedObectTypeSOList)
         {
-            GameObject item = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity, itemListParent);
+            BuildingMenuItem item = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity, itemListParent).GetComponent<BuildingMenuItem>();
+            item.SetPlacedObjectType(p);
         }
     }
 
