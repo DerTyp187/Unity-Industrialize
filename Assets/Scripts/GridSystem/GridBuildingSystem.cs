@@ -207,7 +207,6 @@ public class GridBuildingSystem : MonoBehaviour
             ClearConveyorPath();
 
             List<Vector2Int> pathPoints = VectorDrawing.FindVectorPath(conveyorStartPosition, endPosition);
-            Debug.Log(pathPoints.Count);
             foreach (Vector2Int position in pathPoints)
             {
                 GameObject conveyorBlueprint = Instantiate(selectedPlacedObjectTypeSO.prefab.gameObject, new Vector3(position.x, position.y), Quaternion.identity);

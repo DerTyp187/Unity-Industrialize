@@ -17,9 +17,7 @@ public class PlayerController : MonoBehaviour
         // demolish
         if (Input.GetButtonDown("Demolish"))
         {
-            Debug.Log("Demolish");
-            demolishMode = !demolishMode;
-            movingMode = false;
+            ToggleDemolishMode();
         }
 
         if (demolishMode && Input.GetMouseButton(0) && MenuManager.AllMenusClosed())
@@ -31,9 +29,7 @@ public class PlayerController : MonoBehaviour
         // moving   
         if (Input.GetButtonDown("Move"))
         {
-            Debug.Log("Move");
-            movingMode = !movingMode;
-            demolishMode = false;
+            ToggleMovingMode();
         }
 
         if (movingMode && Input.GetMouseButtonDown(0) && MenuManager.AllMenusClosed())
@@ -43,5 +39,19 @@ public class PlayerController : MonoBehaviour
             GridBuildingSystem.instance.SelectMovingPlacedObject(postion);
             movingMode = false;
         }
+    }
+
+    public void ToggleDemolishMode()
+    {
+        Debug.Log("Demolish");
+        demolishMode = !demolishMode;
+        movingMode = false;
+    }
+
+    public void ToggleMovingMode()
+    {
+        Debug.Log("Move");
+        movingMode = !movingMode;
+        demolishMode = false;
     }
 }
