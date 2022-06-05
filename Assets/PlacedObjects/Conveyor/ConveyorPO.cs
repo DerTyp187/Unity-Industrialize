@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ConveyorPO : PlacedObject
 {
-    public float speed = 0.3f;
+    [SerializeField] private float speed = 0.3f;
 
     public ConveyorPO previousConveyor;
     public ConveyorPO nextConveyor;
@@ -11,6 +11,17 @@ public class ConveyorPO : PlacedObject
     public List<Sprite> sprites = new List<Sprite>(); // 0 = Up, 1 = Right, 2 = Down, 3 = Left
 
 
+    public float GetSpeed()
+    {
+        if (nextConveyor != null)
+        {
+            return speed;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 
     private List<ConveyorPO> GetConveyorsAround()
     {
@@ -36,35 +47,70 @@ public class ConveyorPO : PlacedObject
 
     private void SetConveyorChain()
     {
-        ConveyorPO lastChoiceConveyor = null;
+        // TODO Last conveyor does not connect to first conveyor (circle)        
+        List<ConveyorPO> possibleNextConveyors = GetConveyorsAround();
+        List<ConveyorPO> possiblePreviousConveyors = GetConveyorsAround();
+
+        if (previousConveyor != null && nextConveyor != null)
+        {
+            return;
+        }
+
         foreach (ConveyorPO c in GetConveyorsAround())
         {
             if (c == nextConveyor || c == previousConveyor || c == this || c.previousConveyor == this || c.nextConveyor == this)
             {
                 continue;
             }
-
-            if (c.nextConveyor == null)
+            else
             {
+                if (c.nextConveyor == null)
+                {
+                    if (nextConveyor != c)
+                    {
+                        possiblePreviousConveyors.Add(c);
+                    }
+                }
+
                 if (c.previousConveyor == null)
                 {
-                    lastChoiceConveyor = c;
-                }
-                else
-                {
-                    c.nextConveyor = this;
-                    c.UpdateChain();
-                    previousConveyor = c;
-                    return;
+                    if (previousConveyor != c)
+                    {
+                        possibleNextConveyors.Add(c);
+                    }
                 }
             }
         }
 
-        if (lastChoiceConveyor != null)
+        if (possiblePreviousConveyors.Count > 0 && previousConveyor == null)
         {
-            lastChoiceConveyor.nextConveyor = this;
-            lastChoiceConveyor.UpdateChain();
-            previousConveyor = lastChoiceConveyor;
+            Debug.Log("PREV " + possiblePreviousConveyors.Count);
+            foreach (ConveyorPO c in possiblePreviousConveyors)
+            {
+                if (c.previousConveyor != this && c.nextConveyor == null)
+                {
+                    previousConveyor = c; // Maybe prioritize Conveyor which is already in a chain?
+                    previousConveyor.nextConveyor = this;
+                    previousConveyor.UpdateChain();
+                    break;
+                }
+
+            }
+        }
+
+        if (possibleNextConveyors.Count > 0 && nextConveyor == null)
+        {
+            Debug.Log("Next " + possibleNextConveyors.Count);
+            foreach (ConveyorPO c in possibleNextConveyors)
+            {
+                if (c.nextConveyor != this && c.previousConveyor == null)
+                {
+                    nextConveyor = c; // Maybe prioritize Conveyor which is already in a chain?
+                    nextConveyor.previousConveyor = this;
+                    nextConveyor.UpdateChain();
+                    break;
+                }
+            }
         }
     }
 
