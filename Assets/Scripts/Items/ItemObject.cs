@@ -5,18 +5,19 @@ public abstract class ItemObject : MonoBehaviour
     public int maxStackSize = 5;
     public int stackSize = 1;
     public ItemSO itemSO;
-    public float timeAlive = 0.0f;
-    public float maxTimeAlive = 600.0f;
-    public float maxTimeWithoutConveyor = 10.0f;
-    public float timeWithoutConveyor = 0.0f;
+    [SerializeField] private float timeAlive = 0.0f;
+    [SerializeField] private float maxTimeAlive = 600.0f;
+    [SerializeField] private float maxTimeWithoutConveyor = 10.0f;
+    [SerializeField] private float timeWithoutConveyor = 0.0f;
 
-    private ConveyorPO lastTouchedConveyor; // current conveyor but not set to null
-    private float conveyorSpeed = 0.0f;
-    private Vector2 conveyorDirection = Vector2.zero;
+    [SerializeField] private ConveyorPO lastTouchedConveyor; // current conveyor but not set to null
+    [SerializeField] private float conveyorSpeed = 0.0f;
+    [SerializeField] private Vector2 conveyorDirection = Vector2.zero;
+    [SerializeField] private ConveyorPO currentConveyor;
 
     public abstract void OnSpawn();
 
-    private ConveyorPO currentConveyor;
+
 
     private Rigidbody2D rb;
 
@@ -53,107 +54,101 @@ public abstract class ItemObject : MonoBehaviour
         }
     }
 
+    // Gets the temporary pivot point based on the conveyor direction
+    private Vector3 GetTempPivotPosition(Vector2 conveyorDirection)
+    {
+        Vector3 tempPivotPosition = transform.position;
+
+        if (conveyorDirection == Vector2.up) // Up
+        {
+            Debug.Log("Up");
+            tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, 0, 0);
+        }
+
+        if (conveyorDirection == Vector2.right) // Right
+        {
+            Debug.Log("Right");
+            tempPivotPosition = transform.position + new Vector3(0, transform.localScale.y / 2, 0);
+        }
+
+        if (conveyorDirection == Vector2.down) // Down
+        {
+            Debug.Log("Down");
+            tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, transform.localScale.y, 0);
+        }
+
+        if (conveyorDirection == Vector2.left) // Left
+        {
+            Debug.Log("Left");
+            tempPivotPosition = transform.position + new Vector3(transform.localScale.x, transform.localScale.y / 2, 0);
+        }
+
+        return tempPivotPosition;
+    }
+
     void Update()
     {
+        GridBuildingSystem gridBuildingSystem = GridBuildingSystem.instance;
+
+        # region TimeAlive
         timeAlive += Time.deltaTime;
         if (timeAlive > maxTimeAlive)
         {
             Despawn();
         }
+        #endregion
 
-        // Problem: Pivot point of an item is bottom-left, so its not proberly aligned with the conveyor
-        GridBuildingSystem gridBuildingSystem = GridBuildingSystem.instance;
+        #region ConveyorBehaviour and Movement
+        // TODO Freeze rigibody rotations based on direction      
 
-        //* Position has to change depending on which direction the item is heading, in order to stay on the conveyor
-        Vector3 tempPivotPosition = transform.position;
+        //! DEBUG LINE TO SEE TEMP PIVOT POSITION
+        Debug.DrawLine(GetTempPivotPosition(conveyorDirection), Vector3.zero, Color.red);
 
-        if (currentConveyor != null)
-        {
-            // TODO Freeze rigibody rotations based on direction
-            //* KEEP IN MIND -> PIVOT POINT IS BOTTOM-LEFT
-
-            // If direction changes
-            if (conveyorDirection != currentConveyor.GetDirection())
-            {
-                // Realign
-                gridBuildingSystem.buildingGrid.GetXY(lastTouchedConveyor.gameObject.transform.position, out int x, out int y);
-                transform.position = gridBuildingSystem.buildingGrid.GetWorldPosition(x, y);
-                conveyorDirection = currentConveyor.GetDirection();
-            }
-
-            if (conveyorDirection.y > 0) // Top
-            {
-                Debug.Log("Heading top");
-                tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, 0, 0);
-            }
-
-            if (conveyorDirection.x > 0) // Right
-            {
-                Debug.Log("Heading right");
-                tempPivotPosition = transform.position + new Vector3(0, transform.localScale.y / 2, 0);
-            }
-
-            if (conveyorDirection.y < 0) // Bottom
-            {
-                Debug.Log("Heading bottom");
-                tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, transform.localScale.y, 0);
-            }
-
-            if (conveyorDirection.x < 0) // Left
-            {
-                Debug.Log("Heading left");
-                tempPivotPosition = transform.position + new Vector3(transform.localScale.x, transform.localScale.y / 2, 0);
-            }
-            Debug.DrawLine(tempPivotPosition, Vector3.zero, Color.red);
-        }
-
-
-        gridBuildingSystem.buildingGrid.GetXY(tempPivotPosition, out int tempPivotX, out int tempPivotY);
-
+        gridBuildingSystem.buildingGrid.GetXY(GetTempPivotPosition(conveyorDirection), out int tempPivotX, out int tempPivotY);
         GridBuildingSystem.GridObject gridObject = gridBuildingSystem.buildingGrid.GetGridObject(tempPivotX, tempPivotY);
 
-        if (gridObject.GetPlacedObject() != null)
+        if (gridObject.GetPlacedObject() != null) // If there is a placed object
         {
-            if (gridObject.GetPlacedObject().gameObject.GetComponent<ConveyorPO>())
+            if (gridObject.GetPlacedObject().gameObject.GetComponent<ConveyorPO>()) // If this placed object is conveyor
             {
-                timeWithoutConveyor = 0.0f;
-                currentConveyor = gridObject.GetPlacedObject().gameObject.GetComponent<ConveyorPO>();
-                lastTouchedConveyor = currentConveyor;
-                conveyorSpeed = currentConveyor.GetSpeed();
+                timeWithoutConveyor = 0.0f; // reset time without conveyor
+                currentConveyor = gridObject.GetPlacedObject().gameObject.GetComponent<ConveyorPO>(); // set current conveyor to this conveyor
+                lastTouchedConveyor = currentConveyor; // set last touched conveyor to this conveyor
+                conveyorSpeed = currentConveyor.GetSpeed(); // set conveyor speed to this conveyor
 
+                //* If direction changes
+                if (conveyorDirection != currentConveyor.GetDirection())
+                {
+                    // Realign the item to the grid/conveyor
+                    gridBuildingSystem.buildingGrid.GetXY(lastTouchedConveyor.gameObject.transform.position, out int x, out int y);
+                    transform.position = gridBuildingSystem.buildingGrid.GetWorldPosition(x, y);
+                    conveyorDirection = currentConveyor.GetDirection();
+                }
             }
-            else
+            else // Not on a conveyor
             {
                 UpdateWithoutConveyor();
             }
         }
-        else
+        else // Not even on a placed object -> not on a conveyor
         {
             UpdateWithoutConveyor();
         }
+        #endregion
     }
 
-    private void UpdateWithoutConveyor()
+    private void UpdateWithoutConveyor() // Handles the item when it is not on a conveyor
     {
         currentConveyor = null;
         timeWithoutConveyor += Time.deltaTime;
         if (timeWithoutConveyor > maxTimeWithoutConveyor)
         {
-            Debug.Log("Not on conveyor -> DESPAWN");
             Despawn();
         }
     }
 
     void FixedUpdate()
     {
-        if (currentConveyor != null)
-        {
-            rb.MovePosition(rb.position + (conveyorDirection * conveyorSpeed) * Time.fixedDeltaTime);
-        }
-        else
-        {
-            // TODO Interrupt all movement
-        }
-
+        rb.MovePosition(rb.position + (conveyorDirection * conveyorSpeed) * Time.fixedDeltaTime);
     }
 }
