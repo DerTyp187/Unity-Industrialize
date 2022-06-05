@@ -302,6 +302,10 @@ MonoBehaviour:
   maxTimeAlive: 600
   maxTimeWithoutConveyor: 10
   timeWithoutConveyor: 0
+  lastTouchedConveyor: {fileID: 0}
+  conveyorSpeed: 0
+  conveyorDirection: {x: 0, y: 0}
+  currentConveyor: {fileID: 0}
 --- !u!61 &3180622400512972912
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -326,7 +330,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.1, y: 0.1}
   m_EdgeRadius: 0
 --- !u!50 &3996583985504607898
 Rigidbody2D:

@@ -59,28 +59,25 @@ public abstract class ItemObject : MonoBehaviour
     {
         Vector3 tempPivotPosition = transform.position;
 
+        float bufferSpace = 0.1f;
         if (conveyorDirection == Vector2.up) // Up
         {
-            Debug.Log("Up");
-            tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, 0, 0);
+            tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, bufferSpace, 0);
         }
 
         if (conveyorDirection == Vector2.right) // Right
         {
-            Debug.Log("Right");
-            tempPivotPosition = transform.position + new Vector3(0, transform.localScale.y / 2, 0);
+            tempPivotPosition = transform.position + new Vector3(bufferSpace, transform.localScale.y / 2, 0);
         }
 
         if (conveyorDirection == Vector2.down) // Down
         {
-            Debug.Log("Down");
-            tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, transform.localScale.y, 0);
+            tempPivotPosition = transform.position + new Vector3(transform.localScale.x / 2, transform.localScale.y - bufferSpace, 0);
         }
 
         if (conveyorDirection == Vector2.left) // Left
         {
-            Debug.Log("Left");
-            tempPivotPosition = transform.position + new Vector3(transform.localScale.x, transform.localScale.y / 2, 0);
+            tempPivotPosition = transform.position + new Vector3(transform.localScale.x - bufferSpace, transform.localScale.y / 2, 0);
         }
 
         return tempPivotPosition;
