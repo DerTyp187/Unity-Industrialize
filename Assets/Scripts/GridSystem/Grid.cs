@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Grid<TGridObject>
@@ -45,6 +46,32 @@ public class Grid<TGridObject>
             Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, 100f);
         }
 
+    }
+
+    public List<TGridObject> GetGridObjectsAround(Vector3 position)
+    {
+        List<TGridObject> gridObjects = new List<TGridObject>();
+
+        GetXY(position, out int x, out int y);
+
+        if (x - 1 >= 0)
+        {
+            gridObjects.Add(gridArray[x - 1, y]);
+        }
+        if (x + 1 < width)
+        {
+            gridObjects.Add(gridArray[x + 1, y]);
+        }
+        if (y - 1 >= 0)
+        {
+            gridObjects.Add(gridArray[x, y - 1]);
+        }
+        if (y + 1 < height)
+        {
+            gridObjects.Add(gridArray[x, y + 1]);
+        }
+
+        return gridObjects;
     }
 
     public Vector3 GetWorldPosition(int x, int y)

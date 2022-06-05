@@ -11,8 +11,9 @@ public abstract class PlacedObject : MonoBehaviour
         placedObject.placedObjectTypeSO = placedObjectTypeSO;
         placedObject.origin = origin;
 
-        placedObject.OnPlace();
+
         placedObject.SetIsBlueprint(false);
+        placedObject.OnPlace();
 
         if (placedObjectTypeSO.isWalkable)
         {

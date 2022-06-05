@@ -39,6 +39,13 @@ public class PlayerController : MonoBehaviour
             GridBuildingSystem.instance.SelectMovingPlacedObject(postion);
             movingMode = false;
         }
+
+        //! DEBUG SPAWNING ITEMS
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            Vector3 postion = cam.ScreenToWorldPoint(Input.mousePosition);
+            ItemDictionary.instance.entries[0].Spawn(postion);
+        }
     }
 
     public void ToggleDemolishMode()
