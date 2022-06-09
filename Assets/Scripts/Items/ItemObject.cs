@@ -15,6 +15,8 @@ public abstract class ItemObject : MonoBehaviour
     [SerializeField] private Vector2 conveyorDirection = Vector2.zero;
     [SerializeField] private ConveyorPO currentConveyor;
 
+    [SerializeField] private IOPort ioPort = null;
+
     public abstract void OnSpawn();
 
 
@@ -33,6 +35,7 @@ public abstract class ItemObject : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // Stack Item
         if (collision.gameObject.GetComponent<ItemObject>() != null)
         {
             ItemObject collisionItemObject = collision.gameObject.GetComponent<ItemObject>();
@@ -51,6 +54,12 @@ public abstract class ItemObject : MonoBehaviour
                     collisionItemObject.stackSize = addedStackSize - maxStackSize;
                 }
             }
+        }
+
+        // IOPort
+        if (collision.gameObject.GetComponent<IOPort>() != null)
+        {
+            ioPort = collision.gameObject.GetComponent<IOPort>();
         }
     }
 
@@ -131,6 +140,20 @@ public abstract class ItemObject : MonoBehaviour
         {
             UpdateWithoutConveyor();
         }
+        #endregion
+        #region IOPort
+        if (ioPort != null)
+        {
+            if (ioPort.item == itemSO)
+            {
+                stackSize = ioPort.IncreaseItemCount(stackSize);
+                if (stackSize == 0)
+                {
+                    Despawn();
+                }
+            }
+        }
+
         #endregion
     }
 
